@@ -97,7 +97,7 @@ def apply(url: str, *, dry_run: bool = True, skip_sanity: bool = False) -> dict:
     profile = load_profile()
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=dry_run, channel="chrome")
+        browser = p.chromium.launch(headless=not dry_run, channel="chrome")
         context = browser.new_context(viewport={"width": 1366, "height": 900})
         page = context.new_page()
         try:
