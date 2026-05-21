@@ -10,6 +10,8 @@
     "merge": "node merge-tracker.mjs",
     "pdf": "node generate-pdf.mjs",
     "sync-check": "node cv-sync-check.mjs",
+    "dashboard:job-hunter": "node dashboard/generate-job-hunter.mjs",
+    "dashboard:serve": "node dashboard/serve.mjs",
     "update:check": "node update-system.mjs check",
     "update": "node update-system.mjs apply",
     "rollback": "node update-system.mjs rollback",

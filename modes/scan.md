@@ -196,6 +196,60 @@ Nuevas añadidas a pipeline.md: N
 → Ejecuta /career-ops pipeline para evaluar las nuevas ofertas.
 ```
 
+### Nivel 4 — MCP Job Boards (SESIÓN AGENTE)
+
+`mcp__claude_ai_Indeed__search_jobs`, `mcp__claude_ai_ZipRecruiter__search_jobs`, y `mcp__claude_ai_Dice__search_jobs` son herramientas MCP disponibles **solo dentro de sesiones de Claude Code** — no se pueden llamar desde Node.js standalone.
+
+**Cuándo usar:** Ejecutar manualmente en sesión cuando se quiera un scan de Indeed, ZipRecruiter o Dice además del scan automático de Niveles 1-3.
+
+**Parámetros recomendados para el perfil de este usuario (.NET / C# / NY metro + remote):**
+
+```javascript
+// Indeed
+mcp__claude_ai_Indeed__search_jobs({
+  query: "senior .NET developer C# ASP.NET",
+  location: "New York, NY",
+  radius: 50,
+  employment_type: "fulltime",
+  limit: 25
+})
+
+// ZipRecruiter — SIEMPRE incluir location + country_admin_code aunque sea remote
+// (omitirlos produce error: "Need a location and country code")
+mcp__claude_ai_ZipRecruiter__search_jobs({
+  search: "senior .NET developer C# ASP.NET",
+  location: "New York, NY",
+  country_admin_code: "US",
+  days_ago: 14,
+  limit: 25
+})
+
+// Dice — buscar NY/NJ/CT on-site + remote por separado
+mcp__claude_ai_Dice__search_jobs({
+  q: ".NET developer C# ASP.NET",
+  location: "New York, NY",
+  radius: 50,
+  employment_type: "FULLTIME",
+  posted_date: "FOURTEEN_DAYS",
+  page_size: 25
+})
+mcp__claude_ai_Dice__search_jobs({
+  q: ".NET developer C# ASP.NET",
+  remote_work_type: "REMOTE",
+  employment_type: "FULLTIME",
+  posted_date: "FOURTEEN_DAYS",
+  page_size: 25
+})
+```
+
+**Filtrado:** Aplicar los mismos `title_filter` y `location_filter` de `portals.yml` que los demás niveles.
+
+**Dedup:** Verificar contra `scan-history.tsv`, `applications.md` y `pipeline.md` antes de añadir.
+
+**Registro en scan-history.tsv:** Usar portal `indeed-mcp`, `ziprecruiter-mcp`, o `dice-mcp` según la fuente.
+
+**Nota sobre location filter:** Los resultados de ZipRecruiter con redirect URLs largas (`job-redirect?match_token=...`) contienen la ubicación en el path interno (e.g., `-in-Manhattan,NY`). Los resultados de Dice con `location: null` o vacío pasan el filtro por defecto.
+
 ## Gestión de careers_url
 
 Cada empresa en `tracked_companies` debe tener `careers_url` — la URL directa a su página de ofertas. Esto evita buscarlo cada vez.

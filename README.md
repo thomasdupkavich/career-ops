@@ -229,6 +229,17 @@ go build -o career-dashboard .
 
 Features: 6 filter tabs, 4 sort modes, grouped/flat view, lazy-loaded previews, inline status changes.
 
+## JobHunter Web Dashboard
+
+Generate a local web snapshot that combines career-ops tracker data with the Hermes JobSpy/apply queue artifacts:
+
+```bash
+npm run dashboard:job-hunter
+open dashboard/job-hunter.html
+```
+
+The generated HTML is ignored by git because it embeds local job-search data. Re-run the command whenever JobSpy or the apply queue changes.
+
 ## Project Structure
 
 ```

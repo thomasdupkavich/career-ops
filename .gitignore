@@ -32,6 +32,7 @@ modes/_profile.md
 
 # Generated
 .resolved-prompt-*
+dashboard/job-hunter.html
 node_modules/
 bun.lock
 
@@ -45,3 +46,4 @@ bun.lock
 .claude/memory/
 career-dashboard
 package-lock.json
+.aider*
