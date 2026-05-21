@@ -185,7 +185,8 @@ def apply(url: str, *, dry_run: bool = True, skip_sanity: bool = False) -> dict:
 
     with sync_playwright() as p:
         # Patchright with stealth channel=chrome
-        browser = p.chromium.launch(headless=False if not dry_run else True, channel="chrome")
+        # Dry run = HEADED (so you can watch it work). Submit = headless (background ops).
+        browser = p.chromium.launch(headless=not dry_run, channel="chrome")
         context = browser.new_context(
             user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
             viewport={"width": 1366, "height": 900},
