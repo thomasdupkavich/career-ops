@@ -1105,11 +1105,11 @@ function pollScan() {
       if (d.status === 'done') {
         clearInterval(pollTimer); pollTimer = null;
         document.getElementById('scanFoot').innerHTML = '<span style="color:var(--green);font-size:12px;font-weight:700">Scan complete!</span><button class="btn primary" onclick="window.location.reload()" style="margin-left:auto">Reload Dashboard</button>';
-        document.getElementById('scanBtn').disabled = false;
+        setScanBusy(false);
       } else if (d.status === 'error') {
         clearInterval(pollTimer); pollTimer = null;
         document.getElementById('scanFoot').innerHTML = '<span style="color:var(--rose);font-size:12px">Scan ended with errors — check log above</span><button class="btn" onclick="closeScanModal()" style="margin-left:auto">Close</button>';
-        document.getElementById('scanBtn').disabled = false;
+        setScanBusy(false);
       }
     } catch (_) { /* transient — keep polling */ }
   }, 1000);
