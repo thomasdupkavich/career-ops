@@ -29,8 +29,11 @@ function _outputPdfs() {
 const RESUME_CANDIDATES = [
   ..._outputPdfs(),
   resolve(REPO_ROOT, 'output', 'cv', 'thomas-dupkavich.pdf'),
-  '/Users/tj/.openclaw/workspace/job_search/resume/Thomas_Dupkavich_Resume_.pdf',
-  '/Users/tj/Downloads/Thomas_Dupkavich_Resume_.pdf',
+  // Canonical resume copy inside the repo (synced from the user's GDrive resume).
+  resolve(REPO_ROOT, 'data', 'resume', 'Thomas_Dupkavich_Resume.pdf'),
+  resolve(REPO_ROOT, 'data', 'resume', 'Thomas_Dupkavich_Resume.docx'),
+  // Last-resort fallback, resolved from the home dir (no hardcoded absolute path).
+  resolve(homedir(), 'Downloads', 'Thomas_Dupkavich_Resume.pdf'),
 ];
 
 // Minimal YAML reader — pulls the top-level scalars and one nested level
