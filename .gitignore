@@ -36,6 +36,11 @@ dashboard/job-hunter.html
 node_modules/
 bun.lock
 
+# Self-contained scan engine (local venv + AI-discovery staging)
+scan-engine/.venv/
+scan-engine/__pycache__/
+data/portals-suggestions.md
+
 # OS
 .DS_Store
 *.mov
