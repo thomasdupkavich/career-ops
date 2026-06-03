@@ -25,8 +25,30 @@ const HTML_PATH = res(__dir, 'job-hunter.html');
 const GEN_SCRIPT = res(__dir, 'generate-job-hunter.mjs');
 const DASH_URL = `http://localhost:${PORT}`;
 
-/** @type {{ status: 'idle'|'running'|'done'|'error', log: string[] }} */
-let scanState = { status: 'idle', log: [] };
+/** @type {{ status: 'idle'|'running'|'done'|'error', log: string[], kind: string }} */
+let scanState = { status: 'idle', log: [], kind: '' };
+
+/**
+ * Run a scan engine, streaming its log into scanState, then regenerate the
+ * dashboard. Shared by both the default and deep endpoints so they have one
+ * run lock and one polling contract.
+ * @param {string} kind  'default' | 'deep'
+ * @param {(opts: { onLog: (line: string) => void }) => Promise<any>} runner
+ */
+function startRun(kind, runner) {
+  scanState = { status: 'running', log: [], kind };
+  const onLog = (line) => { scanState.log.push(line.endsWith('\n') ? line : line + '\n'); };
+  Promise.resolve()
+    .then(() => runner({ onLog }))
+    .then(async () => {
+      await generate();
+      scanState.status = 'done';
+    })
+    .catch(err => {
+      scanState.log.push(`\nScan failed: ${err instanceof Error ? err.message : String(err)}\n`);
+      scanState.status = 'error';
+    });
+}
 
 function generate() {
   return new Promise((resolve, reject) => {
