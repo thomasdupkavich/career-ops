@@ -1,0 +1,4 @@
+# JobSpy scraper engine for career-ops self-contained job search.
+# python-jobspy pulls pandas + scraping deps. Pillow is intentionally NOT
+# listed — the Telegram image digest was stripped during the port.
+python-jobspy
