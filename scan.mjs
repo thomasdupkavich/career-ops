@@ -25,21 +25,28 @@
  *   node scan.mjs --company Cohere # scan a single company
  */
 
-import { readFileSync, writeFileSync, appendFileSync, existsSync, mkdirSync, readdirSync } from 'fs';
+import { readFileSync, existsSync, mkdirSync, readdirSync } from 'fs';
 import { pathToFileURL, fileURLToPath } from 'url';
 import path from 'path';
 import yaml from 'js-yaml';
 
 import { makeHttpCtx } from './providers/_http.mjs';
+import {
+  SCAN_HISTORY_PATH,
+  PIPELINE_PATH,
+  loadSeenUrls,
+  loadSeenCompanyRoles,
+  appendToPipeline,
+  appendToScanHistory,
+} from './scan-lib.mjs';
 
 const parseYaml = yaml.load;
 
 // ── Config ──────────────────────────────────────────────────────────
+// Path constants + the dedup/append writers live in scan-lib.mjs so the
+// JobSpy adapter and Deep Scan agents share the exact same sink.
 
 const PORTALS_PATH = 'portals.yml';
-const SCAN_HISTORY_PATH = 'data/scan-history.tsv';
-const PIPELINE_PATH = 'data/pipeline.md';
-const APPLICATIONS_PATH = 'data/applications.md';
 const PROVIDERS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'providers');
 
 // Ensure required directories exist (fresh setup)
