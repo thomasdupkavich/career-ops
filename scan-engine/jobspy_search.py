@@ -117,6 +117,9 @@ REMOTE_QUERIES = [
     # Add broader remote searches
     {'search_term': 'Senior Software Engineer .NET', 'location': 'United States', 'is_remote': True, 'site_name': ['indeed','linkedin','google'], 'kind': 'remote'},
     {'search_term': 'Backend Developer C#', 'location': 'United States', 'is_remote': True, 'site_name': ['indeed','google'], 'kind': 'remote'},
+    # Resume-driven: Blazor is a headline skill on the CV.
+    {'search_term': 'Blazor Developer', 'location': 'United States', 'is_remote': True, 'site_name': ['indeed','linkedin','google'], 'kind': 'remote'},
+    {'search_term': 'Full Stack .NET Blazor', 'location': 'United States', 'is_remote': True, 'site_name': ['indeed','google'], 'kind': 'remote'},
 ]
 
 # Local searches are intentionally broad: don't put "hybrid" in the query, because LinkedIn/Indeed often
