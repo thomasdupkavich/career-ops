@@ -32,12 +32,19 @@ const AGENT_TIMEOUT_MS = Number(process.env.DEEP_SCAN_TIMEOUT_MS || 6 * 60 * 100
 
 const PROMPT = `You are a job-discovery agent for the "career-ops" job search system. Working directory is the career-ops project root.
 
-TASK — discover NEW software-engineering job postings and companies that are NOT already tracked:
-1. Read config/profile.yml and modes/_profile.md to learn the user's target roles, stack, location policy, and salary floor.
-2. Read portals.yml to see which companies are ALREADY tracked — do NOT repeat those.
-3. Read the first ~30 lines of data/scan-history.tsv to see recently-seen URLs — do NOT repeat those.
-4. Use web search and any available job-board tools (Indeed / Dice / ZipRecruiter / Greenhouse / Ashby / Lever) to find fresh postings that match the targeting and respect the location policy.
-5. Also identify NEW companies (with an ATS careers URL) worth adding to the tracker.
+CANDIDATE PROFILE — read these files; they are the search criteria (resume is the source of truth):
+1. cv.md — the candidate's RESUME. Primary source for skills, seniority, and target roles.
+2. config/profile.yml — location policy, salary floor, archetypes.
+3. data/resume/ — the original resume document, if you need it.
+
+Quick profile (verify against cv.md): Full-Stack .NET Software Engineer, ~6 years. Core stack: C#, ASP.NET MVC/Core, ASP.NET Web API, Blazor (Server-Side), VB.NET, SQL Server / T-SQL, Entity Framework, JavaScript / jQuery / AJAX, Kendo UI / Telerik. Domain: enterprise web apps, manufacturing/logistics, hardware-software integration, real-time data. Location: Huntington Station, Long Island NY (11746) — wants FULLY REMOTE *or* Long Island commutable; NYC/Manhattan excluded. Salary floor ~$120k+. No clearance-required or entry-level roles.
+
+TASK — find FRESH job postings that genuinely match this resume, using EVERY job-search connector/app and tool available to you:
+- Job-board connectors/apps: Indeed, Dice, ZipRecruiter, LinkedIn — whichever MCP connectors/apps you have access to. USE THEM; they are the point of this run.
+- Web research connectors: Exa, Tavily, and general web search.
+- Search the candidate's real stack (.NET / C# / ASP.NET / Blazor / SQL Server), filtered to remote or Long Island NY.
+Read portals.yml and the first ~30 lines of data/scan-history.tsv first, and SKIP any company/URL already tracked there.
+Also surface NEW companies (with an ATS careers URL) worth adding to the tracker.
 
 DISCOVERY ONLY — do not score, do not write any files, do not apply.
 
@@ -46,7 +53,7 @@ OUTPUT CONTRACT — your FINAL message must be ONLY a single fenced json block, 
 {"postings":[{"url":"https://...","company":"...","title":"...","location":"..."}],
  "portals_suggestions":[{"name":"...","careers_url":"https://...","provider":"greenhouse|ashby|lever|recruitee|smartrecruiters"}]}
 \`\`\`
-Use real, verified URLs only. If you find nothing, return empty arrays. Keep to at most 25 postings.`;
+Use real, verified URLs only (prefer the employer's direct posting). If you find nothing, return empty arrays. Keep to at most 25 postings.`;
 
 const AGENTS = [
   {
