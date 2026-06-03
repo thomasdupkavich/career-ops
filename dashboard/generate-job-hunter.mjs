@@ -893,7 +893,7 @@ function setView(id) {
 function renderNav() {
   const nav = document.getElementById("nav");
   nav.innerHTML = NAV.map(function(item) {
-    const badge = item[2] !== "" ? '<span class="badge' + (item[0] === "queue" && DATA.stats.queueFailed ? " rose" : "") + '">' + esc(item[2]) + '</span>' : "";
+    const badge = item[2] !== "" ? '<span class="badge">' + esc(item[2]) + '</span>' : "";
     return '<button data-view="' + item[0] + '"><span>' + esc(item[1]) + '</span>' + badge + '</button>';
   }).join("");
   nav.querySelectorAll("button").forEach(function(button) {
