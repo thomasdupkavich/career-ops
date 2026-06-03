@@ -829,7 +829,8 @@ tr:last-child td { border-bottom: 0; }
   <aside class="sidebar">
     <div class="brand"><div class="mark">JH</div><div class="brand-name">Job<span>Hunter</span></div></div>
     <nav class="nav" id="nav"></nav>
-    <button class="scan-btn" id="scanBtn" onclick="startScan()">&#x27F3; Scan Now</button>
+    <button class="scan-btn" id="scanBtn" onclick="startScan()" title="ATS portals + JobSpy aggregators — free, no tokens">&#x27F3; Scan Now</button>
+    <button class="scan-btn deep" id="deepScanBtn" onclick="startDeepScan()" title="Claude + Codex discover new companies/boards — uses tokens">&#x1F50D; Deep Scan</button>
     <div class="profile">
       <div class="avatar" id="avatar">TD</div>
       <div><strong id="profileName"></strong><span id="profileTitle"></span></div>
