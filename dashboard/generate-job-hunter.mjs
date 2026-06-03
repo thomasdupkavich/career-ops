@@ -953,7 +953,7 @@ function filteredLeads() {
 }
 function renderDiscover() {
   document.getElementById("discover").innerHTML =
-    '<div class="view-header"><div><h1>Discover Jobs</h1><p class="sub">' + fmt(DATA.stats.rawCount) + ' raw Hermes jobs, ' + fmt(DATA.stats.afterDedupe) + ' deduped, ' + fmt(DATA.stats.openclawLeads) + ' OpenClaw digest leads, and ' + fmt(DATA.stats.careerOpsLeads) + ' Career-Ops provider leads.</p></div><div class="controls"><input class="input" id="leadSearch" placeholder="Search leads, companies, skills"><button class="btn primary" id="clearLeadSearch">Clear</button></div></div>' +
+    '<div class="view-header"><div><h1>Discover Jobs</h1><p class="sub">' + fmt(DATA.stats.totalLeads) + ' leads from ATS portals, JobSpy aggregators, and Deep Scan — ' + fmt(DATA.stats.scanHistoryCount) + ' total scanned.</p></div><div class="controls"><input class="input" id="leadSearch" placeholder="Search leads, companies, skills"><button class="btn primary" id="clearLeadSearch">Clear</button></div></div>' +
     '<div class="controls" style="margin-bottom:16px">' +
       ['all','elite','strong','prepared','providers'].map(function(key) { return '<button class="chip" data-filter="' + key + '">' + ({all:'All leads', elite:'Elite 80+', strong:'Strong 70+', prepared:'Prepped', providers:'Providers'})[key] + '</button>'; }).join("") +
     '</div><div class="job-list" id="leadResults"></div>';
