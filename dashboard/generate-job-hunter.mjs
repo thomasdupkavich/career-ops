@@ -19,26 +19,7 @@ for (let i = 2; i < process.argv.length; i += 1) {
   args.set(key, value);
 }
 
-const hermesHome = path.resolve(
-  args.get("hermes-home") ||
-    process.env.HERMES_HOME ||
-    path.join(homeDir, ".hermes"),
-);
-const jobSearchDir = path.resolve(
-  args.get("job-search-dir") ||
-    process.env.HERMES_JOB_SEARCH_DIR ||
-    path.join(hermesHome, "job-search"),
-);
-const openclawHome = path.resolve(
-  args.get("openclaw-home") ||
-    process.env.OPENCLAW_HOME ||
-    path.join(homeDir, ".openclaw"),
-);
-const openclawJobSearchDir = path.resolve(
-  args.get("openclaw-job-search-dir") ||
-    process.env.OPENCLAW_JOB_SEARCH_DIR ||
-    path.join(openclawHome, "workspace", "job_search"),
-);
+// Career-ops is the single source of truth — no Hermes/OpenClaw paths.
 const projectRoot = path.resolve(
   args.get("project-root") ||
     process.env.CAREER_OPS_ROOT ||
