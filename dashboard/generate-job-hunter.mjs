@@ -1039,7 +1039,6 @@ function boot() {
   renderDashboard();
   renderDiscover();
   renderApplications();
-  renderQueue();
   renderEngine();
 }
 boot();
