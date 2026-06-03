@@ -599,106 +599,62 @@ function parseOpenClawRuns(openclawRoot) {
   };
 }
 
-function buildSnapshot() {
-  const jobsPayload = readJson(path.join(jobSearchDir, "jobs-last.json"), {});
-  const queueRaw = readJson(path.join(jobSearchDir, "apply-queue.json"), []);
-  const profile = readJson(path.join(jobSearchDir, "profile.json"), {});
-  const cronPayload = readJson(path.join(hermesHome, "cron", "jobs.json"), { jobs: [] });
-  const openclaw = parseOpenClawRuns(openclawHome);
+function readYaml(filePath, fallback) {
+  try {
+    return yaml.load(fs.readFileSync(filePath, "utf8")) || fallback;
+  } catch {
+    return fallback;
+  }
+}
 
-  const queue = Array.isArray(queueRaw)
-    ? queueRaw.map(normalizeQueueItem)
-    : [];
-  const queueByKey = new Map(
-    queueRaw.map((item) => [
-      [item.company || "", item.title || "", item.url || ""].join("|").toLowerCase(),
-      item,
-    ]),
-  );
+function buildSnapshot() {
+  // Career-ops is the single source of truth. Every engine — ATS (scan.mjs),
+  // JobSpy (scan-engine), and Deep Scan (claude/codex) — writes into
+  // data/scan-history.tsv + data/pipeline.md, so the leads parsed here already
+  // include all of them. No Hermes or OpenClaw paths are read.
   const applications = parseApplications();
   const pipeline = parsePipeline();
   const scanHistory = parseScanHistory();
   const providerInventory = parseProviderInventory();
   const careerOpsLeadsRaw = parseCareerOpsLeads(scanHistory, pipeline);
-  const hermesJobs = flattenJobPayload(jobsPayload)
-    .map((job, index) => normalizeJob(job, index, queueByKey, "Hermes"));
-  const openclawLeads = openclaw.leads.map((job, index) => ({
-    ...job,
-    number: hermesJobs.length + index + 1,
-  }));
-  const careerOpsLeads = careerOpsLeadsRaw.map((job, index) => ({
-    ...job,
-    number: hermesJobs.length + openclawLeads.length + index + 1,
-  }));
-  const jobs = [
-    ...hermesJobs,
-    ...openclawLeads,
-    ...careerOpsLeads,
-  ];
-  const stats = jobsPayload.stats || {};
-  const hermesCronJobs = parseHermesCronJobs(cronPayload);
-  const openclawCronJobs = parseOpenClawCronJobs(openclawHome);
-  const cronJobs = [...hermesCronJobs, ...openclawCronJobs];
+  const jobs = careerOpsLeadsRaw.map((job, index) => ({ ...job, number: index + 1 }));
 
-  const rawSourceCounts = {
-    ...(stats.jobspy_source_counts || {}),
-    ...(stats.feed_source_counts || {}),
-    ...(stats.shown_source_counts || {}),
-  };
-  const hermesSources = Object.entries(rawSourceCounts)
-    .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count);
+  const profileYml = readYaml(path.join(projectRoot, "config", "profile.yml"), {});
+  const candidate = profileYml.candidate || {};
+  const targetRoles = (profileYml.target_roles && profileYml.target_roles.primary) || [];
+  const comp = profileYml.compensation || profileYml.salary || {};
+  const locPolicy = profileYml.location_policy || profileYml.location || {};
+
   const scannedPortals = countBy(scanHistory, (item) => item.portal || item.source);
-  const sources = mergeCounts([hermesSources, scannedPortals]);
+  const sources = mergeCounts([scannedPortals]);
 
   return {
     generatedAt: new Date().toISOString(),
-    paths: {
-      projectRoot,
-      hermesHome,
-      jobSearchDir,
-      openclawHome,
-      openclawJobSearchDir,
-    },
+    paths: { projectRoot },
     user: {
-      name: profile.name || "Thomas Dupkavich",
-      title: profile.current_role || "Software Engineer",
-      location: profile.location || "",
-      remotePreference: profile.remote_preference || "",
-      salaryMin: profile.target_salary_min || "",
-      yearsExperience: profile.years_experience || "",
+      name: candidate.full_name || candidate.name || "Thomas Dupkavich",
+      title: targetRoles[0] || "Software Engineer",
+      location: candidate.location || "",
+      remotePreference: (typeof locPolicy === "string" ? locPolicy : locPolicy.summary) || "",
+      salaryMin: comp.target_min || comp.minimum || comp.min || "",
+      yearsExperience: candidate.years_experience || "",
     },
     stats: {
-      rawCount: stats.raw_count || 0,
-      afterDedupe: stats.after_dedupe || 0,
-      shown: stats.shown || hermesJobs.length,
       totalLeads: jobs.length,
-      hermesLeads: hermesJobs.length,
-      openclawLeads: openclaw.leads.length,
-      careerOpsLeads: careerOpsLeads.length,
-      shownRemote: stats.shown_remote || 0,
-      shownHybrid: stats.shown_hybrid || 0,
-      skippedBelowThreshold: stats.skipped_below_threshold || 0,
-      queueSize: queue.length,
-      queueSubmitted: queue.filter((item) => item.submitted).length,
-      queueFailed: queue.filter((item) => /fail|error|captcha|not_found/i.test(item.status)).length,
+      careerOpsLeads: jobs.length,
+      scanHistoryCount: scanHistory.length,
       pendingUrls: pipeline.filter((item) => !item.done).length,
       trackedApplications: applications.length,
       activeApplications: applications.filter((item) => !/reject|discard|skip|closed/i.test(item.status)).length,
-      hermesCronHooks: hermesCronJobs.length,
-      openclawCronHooks: openclawCronJobs.length,
       providerAdapters: providerInventory.length,
     },
     jobs,
-    queue,
     applications,
     pipeline,
     scanHistory,
     sourceBreakdown: sources,
     scannedPortals,
     providerInventory,
-    cronJobs,
-    openclaw,
   };
 }
 
