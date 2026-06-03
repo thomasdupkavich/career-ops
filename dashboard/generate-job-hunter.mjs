@@ -846,7 +846,7 @@ tr:last-child td { border-bottom: 0; }
 <div class="scan-overlay" id="scanOverlay">
   <div class="scan-modal">
     <div class="scan-modal-head">
-      <h2>Portal Scan</h2>
+      <h2 id="scanModalTitle">Portal Scan</h2>
       <button onclick="closeScanModal()" style="background:none;border:0;color:var(--text-dim);cursor:pointer;font-size:20px;line-height:1;padding:0 4px">&times;</button>
     </div>
     <div class="scan-log" id="scanLog">Ready to scan…</div>
