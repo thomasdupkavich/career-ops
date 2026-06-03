@@ -33,14 +33,10 @@ from typing import Any
 
 from jobspy import scrape_jobs
 
-HOME = Path('/Users/tj/.hermes')
-OUTDIR = HOME / 'job-search'
-OUTDIR.mkdir(parents=True, exist_ok=True)
-RESUME_PATH = HOME / 'cache/documents/doc_d80675106b28_Thomas_Dupkavich_Resume_.docx'
-APP_LOG = OUTDIR / 'applications.json'
-LAST_JSON = OUTDIR / 'jobs-last.json'
-
-APIFY_ENV_FILES = [HOME / '.env']
+# Self-contained: no Hermes paths. Apify token (optional) is read from the
+# project's .env (career-ops root) or the live environment — see env_value().
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+APIFY_ENV_FILES = [PROJECT_ROOT / '.env']
 APIFY_BUILTIN_ACTOR = 'logiover~built-in-tech-jobs-scraper'
 APIFY_WELLFOUND_ACTOR = 'blackfalcondata~wellfound-scraper'
 APIFY_TIMEOUT_SECS = 150
