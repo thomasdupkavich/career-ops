@@ -840,7 +840,6 @@ tr:last-child td { border-bottom: 0; }
     <section class="view active" id="dashboard"></section>
     <section class="view" id="discover"></section>
     <section class="view" id="applications"></section>
-    <section class="view" id="queue"></section>
     <section class="view" id="engine"></section>
   </main>
 </div>
