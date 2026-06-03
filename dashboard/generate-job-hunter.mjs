@@ -906,26 +906,21 @@ function stat(label, value, note, highlight) {
 }
 function renderDashboard() {
   const s = DATA.stats;
-  const submittedPct = s.queueSize ? Math.round((s.queueSubmitted / s.queueSize) * 100) : 0;
-  const failedPct = s.queueSize ? Math.round((s.queueFailed / s.queueSize) * 100) : 0;
-  const queuedPct = Math.max(0, 100 - submittedPct - failedPct);
   const topLeads = DATA.jobs.slice()
     .sort(function(a, b) { return Number(b.score || 0) - Number(a.score || 0); })
     .slice(0, 4)
-    .map(renderLeadCard).join("") || '<div class="empty">No leads found yet.</div>';
+    .map(renderLeadCard).join("") || '<div class="empty">No leads found yet. Hit Scan Now to fetch postings.</div>';
   document.getElementById("dashboard").innerHTML =
     '<div class="view-header"><div><h1>Dashboard</h1><p class="sub">Career command center for ' + esc(DATA.user.title) + '. Snapshot generated ' + esc(dt(DATA.generatedAt)) + '.</p></div><div class="controls"><button class="btn" onclick="refreshSnapshot()">Refresh snapshot</button><a class="btn primary" href="#discover" data-jump="discover">View leads</a></div></div>' +
     '<div class="stats">' +
-      stat("Raw jobs scanned", fmt(s.rawCount), fmt(s.afterDedupe) + " after dedupe") +
-      stat("Leads shown", fmt(s.totalLeads), fmt(s.hermesLeads) + " Hermes, " + fmt(s.openclawLeads) + " OpenClaw, " + fmt(s.careerOpsLeads) + " Career-Ops", true) +
-      stat("Apply queue", fmt(s.queueSize), fmt(s.queueSubmitted) + " submitted, " + fmt(s.queueFailed) + " blocked") +
-      stat("Agent crons", fmt(DATA.cronJobs.length), fmt(s.hermesCronHooks) + " Hermes, " + fmt(s.openclawCronHooks) + " OpenClaw") +
+      stat("Leads found", fmt(s.totalLeads), fmt(s.scanHistoryCount) + " total scanned", true) +
+      stat("Pending review", fmt(s.pendingUrls), "in pipeline inbox") +
+      stat("Applications", fmt(s.trackedApplications), fmt(s.activeApplications) + " active") +
+      stat("Scan sources", fmt(DATA.sourceBreakdown.length), fmt(s.providerAdapters) + " ATS providers") +
     '</div>' +
-    '<div class="grid two"><div class="panel"><div class="panel-head"><h2>Top Leads Ready</h2><span class="meta">Hermes + OpenClaw score</span></div><div class="job-list">' + topLeads + '</div></div>' +
+    '<div class="grid two"><div class="panel"><div class="panel-head"><h2>Top Leads</h2><span class="meta">by score</span></div><div class="job-list">' + topLeads + '</div></div>' +
     '<div class="grid">' +
-      '<div class="panel"><div class="panel-head"><h2>Apply Queue</h2><span class="meta">' + fmt(s.queueSize) + ' items</span></div><div class="bar"><span style="width:' + submittedPct + '%;background:var(--green)"></span><span style="width:' + failedPct + '%;background:var(--rose)"></span><span style="width:' + queuedPct + '%;background:var(--accent)"></span></div><div class="legend"><span><i class="dot" style="background:var(--green)"></i>Submitted ' + fmt(s.queueSubmitted) + '</span><span><i class="dot" style="background:var(--rose)"></i>Blocked ' + fmt(s.queueFailed) + '</span><span><i class="dot" style="background:var(--accent)"></i>Queued ' + fmt(Math.max(0, s.queueSize - s.queueSubmitted - s.queueFailed)) + '</span></div></div>' +
-      '<div class="panel"><div class="panel-head"><h2>Sources</h2><span class="meta">' + DATA.sourceBreakdown.length + ' active feeds</span></div><div class="split-list">' + DATA.sourceBreakdown.slice(0, 6).map(function(src) { return '<div class="kv"><span>' + esc(src.name) + '</span><strong>' + fmt(src.count) + '</strong></div>'; }).join("") + '</div></div>' +
-      '<div class="panel"><div class="panel-head"><h2>Engine</h2><span class="meta">' + DATA.cronJobs.length + ' job hooks</span></div><div class="split-list">' + DATA.cronJobs.slice(0, 4).map(function(job) { return '<div class="kv"><span>' + esc(job.name) + '</span><strong>' + esc(job.enabled ? "on" : "paused") + '</strong></div>'; }).join("") + '</div></div>' +
+      '<div class="panel"><div class="panel-head"><h2>Sources</h2><span class="meta">' + DATA.sourceBreakdown.length + ' feeds</span></div><div class="split-list">' + (DATA.sourceBreakdown.slice(0, 8).map(function(src) { return '<div class="kv"><span>' + esc(src.name) + '</span><strong>' + fmt(src.count) + '</strong></div>'; }).join("") || '<div class="empty">No scans yet.</div>') + '</div></div>' +
     '</div></div>';
   bindJumpLinks();
 }
