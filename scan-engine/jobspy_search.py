@@ -100,7 +100,7 @@ LOCAL_LONG_ISLAND_TERMS = [
 ]
 NYC_TERMS = ['new york, ny', 'nyc', 'manhattan', 'brooklyn', 'queens', 'bronx', 'staten island', 'jersey city', 'hoboken', 'long island city', 'lic, ny']
 HYBRID_TERMS = ['hybrid', '#li-hybrid', 'on-site', 'onsite', 'in-office', 'in office', 'office days', 'office 2 days', 'office 3 days', 'commute', 'flexible schedule']
-LOCAL_SEARCH_TERMS = ['Software Engineer', 'Software Developer', '.NET Developer', 'C# Developer', 'ASP.NET Developer', 'Full Stack Developer', 'Application Developer', 'SQL Server Developer']
+LOCAL_SEARCH_TERMS = ['Software Engineer', 'Software Developer', '.NET Developer', 'C# Developer', 'ASP.NET Developer', 'Blazor Developer', 'Full Stack Developer', 'Application Developer', 'SQL Server Developer']
 LOCAL_LOCATIONS = ['11746', 'Huntington Station, NY', 'Melville, NY', 'Bethpage, NY', 'Plainview, NY', 'Hauppauge, NY', 'Hicksville, NY', 'Syosset, NY', 'Farmingdale, NY', 'Garden City, NY', 'Long Island, NY']
 TARGET_COMPANIES = [
     'zebra technologies', 'canon usa', 'broadridge', 'northwell', 'henry schein',
