@@ -141,34 +141,29 @@ const server = http.createServer((req, r) => {
     return;
   }
 
-  // ── Start scan ───────────────────────────────────────────────────
+  // ── Start default scan (ATS portals + JobSpy aggregators — free) ──
   if (req.method === 'POST' && url.pathname === '/api/scan') {
     if (scanState.status === 'running') {
       sendJson(r, 409, { error: 'Scan already running' });
       return;
     }
-    scanState = { status: 'running', log: [] };
-    const proc = spawn('node', ['scan.mjs'], { cwd: ROOT });
-    proc.stdout.on('data', d => scanState.log.push(String(d)));
-    proc.stderr.on('data', d => scanState.log.push(String(d)));
-    proc.on('close', async code => {
-      if (code === 0) {
-        try {
-          await generate();
-          scanState.status = 'done';
-        } catch (e) {
-          scanState.log.push(`\nDashboard refresh failed: ${e instanceof Error ? e.message : String(e)}`);
-          scanState.status = 'error';
-        }
-      } else {
-        scanState.status = 'error';
-      }
-    });
+    startRun('default', ({ onLog }) => runDefaultScan({ onLog }));
     sendJson(r, 200, { ok: true });
     return;
   }
 
-  // ── Poll scan status ─────────────────────────────────────────────
+  // ── Start deep scan (Claude + Codex discovery — spends tokens) ────
+  if (req.method === 'POST' && url.pathname === '/api/scan/deep') {
+    if (scanState.status === 'running') {
+      sendJson(r, 409, { error: 'Scan already running' });
+      return;
+    }
+    startRun('deep', ({ onLog }) => runDeepScan({ onLog }));
+    sendJson(r, 200, { ok: true });
+    return;
+  }
+
+  // ── Poll scan status (shared by both scan kinds) ─────────────────
   if (req.method === 'GET' && url.pathname === '/api/scan/status') {
     sendJson(r, 200, scanState);
     return;
