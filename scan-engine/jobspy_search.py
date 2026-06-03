@@ -1219,100 +1219,50 @@ def main() -> int:
         else:
             skipped.append(s)
     scored.sort(key=digest_sort_key, reverse=True)
-    allowed_chances = {'high','good','possible'}
-    remote_pool=[j for j in scored if j.get('category') == 'remote' and j.get('interview_chance') in allowed_chances]
-    hybrid_pool=[j for j in scored if j.get('category') == 'local_hybrid' and (j.get('interview_chance') in allowed_chances or int(j.get('score') or 0) >= HYBRID_MIN_SCORE)]
-    onsite_pool=[j for j in scored if j.get('category') == 'local' and (j.get('interview_chance') in allowed_chances or int(j.get('score') or 0) >= ONSITE_MIN_SCORE)]
-    local_skipped_debug=sorted([
-        j for j in skipped
-        if j.get('query_kind') == 'local' or j.get('category') in ('local_hybrid','local') or 'long island' in (j.get('location','') + ' ' + j.get('snippet','')).lower()
-    ], key=lambda x: (x.get('score', 0), x.get('breakdown', {}).get('keywords', 0)), reverse=True)[:15]
-    skip_reason_counts={}
-    for j in skipped:
-        reason=j.get('skip_reason') or 'below score/url threshold'
-        skip_reason_counts[reason]=skip_reason_counts.get(reason,0)+1
-    top, sectioned_top = selected_digest_sections(remote_pool, hybrid_pool, onsite_pool)
-    if not top:
-        fallback=sorted([x for x in skipped if x.get('url')], key=digest_sort_key, reverse=True)[:3]
-        sectioned_top = {
-            'remote': [j for j in fallback if j.get('category') == 'remote'],
-            'hybrid': [j for j in fallback if j.get('category') == 'local_hybrid'],
-            'onsite': [j for j in fallback if j.get('category') == 'local'],
-        }
-        top = fallback
-    for i,j in enumerate(top,1): j['n']=i
-    remote_top=sectioned_top.get('remote') or []
-    hybrid_top=sectioned_top.get('hybrid') or []
-    onsite_top=sectioned_top.get('onsite') or []
-    local_top=hybrid_top + onsite_top
-    now=dt.datetime.now().isoformat(timespec='seconds')
-    payload={
-        'generated_at':now,
-        'resume_path':str(RESUME_PATH),
-        'preferences':{
-            'remote':'completely remote only',
-            'local_hybrid':f'Long Island only, target ≤{LOCAL_RADIUS_MILES} miles from {HOME_ZIP}; NYC excluded',
-            'ranking':'prioritize good/high interview-chance proxy from fit + direct apply/competition + freshness',
-            'blocked_companies':['SCM Products','Adept Technology','Adept Technologies','Adept Technology Consulting'],
-            'target_companies':TARGET_COMPANIES,
-        },
-        'stats':{
-            'jobspy_queries':{f"{r['query']} [{r.get('kind','')} {r.get('location','')}]":r['count'] for r in jobspy_results},
-            'jobspy_errors':[f"{r['query']}: {r['error']}" for r in jobspy_results if r['error']],
-            'jobspy_source_counts':source_counts([j for r in jobspy_results for j in r.get('jobs', [])]),
-            'public_feed_count':len([j for j in feed if not j.get('error')]),
-            'feed_source_counts':source_counts(feed),
-            'candidate_source_counts':source_counts(scored),
-            'shown_source_counts':source_counts(top),
-            'raw_count':len(raw),'after_dedupe':len(grouped),'shown':len(top),
-            'shown_local_hybrid':len(local_top),'shown_remote':len(remote_top),
-            'shown_hybrid':len(hybrid_top),'shown_onsite':len(onsite_top),
-            'candidate_remote_count':len(remote_pool),'candidate_hybrid_count':len(hybrid_pool),'candidate_onsite_count':len(onsite_pool),
-            'local_raw_count':local_raw_count,
-            'local_scored_count':len([j for j in scored if j.get('query_kind') == 'local' or j.get('category') in ('local_hybrid','local')]),
-            'local_skipped_debug_count':len(local_skipped_debug),
-            'skip_reason_counts':skip_reason_counts,
-            'skipped_below_threshold':len(skipped)
-        },
-        'sections':{'remote':remote_top,'hybrid':hybrid_top,'onsite':onsite_top,'local_hybrid':local_top},
-        'debug':{'local_skipped_top':local_skipped_debug},
-        'jobs':top
-    }
-    LAST_JSON.write_text(json.dumps(payload, indent=2, ensure_ascii=False))
-    report=OUTDIR / f"job-search-{dt.date.today().isoformat()}.md"
-    lines=[f"# Job Search — {dt.date.today().isoformat()}", '', json.dumps(payload['stats'], indent=2), '']
-    for heading, jobs in [
-        ('Completely remote — best match + realistic interview odds', remote_top),
-        (f'LI hybrid near {HOME_ZIP} — ranked separately', hybrid_top),
-        (f'LI onsite near {HOME_ZIP} — ranked separately', onsite_top),
-    ]:
-        lines += [f"## {heading}", '']
-        if not jobs:
-            lines += ['No matches in this section today after commute/interview-chance filters.', '']
-        for j in jobs:
-            b=j['breakdown']
-            lines += [
-                f"### #{j['n']} — {j['title']} at {j['company']}",
-                f"Score: {j['score']}/100",
-                f"Interview chance proxy: {j['interview_chance']}",
-                f"Profile: {b.get('score_profile', j.get('score_profile', ''))}",
-                f"Fit: {b['fit']}/{b.get('fit_max', 60)} (keywords {b['keywords']}, salary {b['salary']}, location {b['location']}, seniority {b['seniority']})",
-                f"Realism: {b['hireability']}/{b.get('hireability_max', 40)} (competition {b['competition']}/{b.get('competition_max', '?')}: {b.get('competition_reason', '')}; freshness {b['freshness']}/{b.get('freshness_max', '?')}: {b.get('freshness_reason', '')})",
-                f"Bonus: {b['bonus']}/5 ({b['bonus_reason']})",
-                f"Salary: {j['salary']}",
-                f"Location: {j['location']}",
-                f"Source: {j['source']} / {', '.join(j.get('sources_seen', []))}",
-                f"Posted: {j.get('posted') or 'unknown'}",
-                f"Keywords: {', '.join(j['keywords_matched'])}",
-                f"URL: {j['url']}",
-                ''
-            ]
-    report.write_text('\n'.join(lines), encoding='utf-8')
 
-    print(render_media_digest(payload))
+    # ── Emit normalized postings to stdout for the Node adapter ──────────
+    # Every posting that cleared its profile's min-score gate (and has a URL)
+    # is exported. Downstream dedup (against pipeline.md/scan-history.tsv) is
+    # the Node sink's job, so we hand it the full scored set, not a digest.
+    postings = []
+    for s in scored:
+        url = s.get('url')
+        if not url:
+            continue
+        site = clean(s.get('source') or 'feed') or 'feed'
+        portal = 'jobspy-' + (re.sub(r'[^a-z0-9]+', '', site.lower()) or 'feed')
+        postings.append({
+            'url': url,
+            'company': s.get('company') or '',
+            'title': s.get('title') or '',
+            'location': s.get('location') or '',
+            'portal': portal,
+            'score': s.get('score'),
+            'score_profile': s.get('score_profile') or '',
+            'category': s.get('category') or '',
+            'interview_chance': s.get('interview_chance') or '',
+            'posted': s.get('posted') or '',
+            'salary': s.get('salary') or '',
+            'sources_seen': s.get('sources_seen') or [],
+        })
+
+    stats = {
+        'generated_at': dt.datetime.now().isoformat(timespec='seconds'),
+        'raw_count': len(raw),
+        'after_dedupe': len(grouped),
+        'scored': len(scored),
+        'emitted': len(postings),
+        'skipped_below_threshold': len(skipped),
+        'local_raw_count': local_raw_count,
+        'public_feed_count': len([j for j in feed if not j.get('error')]),
+        'jobspy_errors': [f"{r['query']}: {r['error']}" for r in jobspy_results if r['error']],
+        'jobspy_queries': {f"{r['query']} [{r.get('kind','')} {r.get('location','')}]": r['count'] for r in jobspy_results},
+    }
+
+    json.dump({'postings': postings, 'stats': stats}, sys.stdout, ensure_ascii=False)
+    sys.stdout.write('\n')
     return 0
 
+
 if __name__ == '__main__':
-    if '--preview-from-last' in sys.argv:
-        raise SystemExit(preview_from_last())
     raise SystemExit(main())
