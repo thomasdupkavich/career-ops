@@ -859,8 +859,7 @@ const NAV = [
   ["dashboard", "Dashboard", ""],
   ["discover", "Discover Jobs", DATA.jobs.length],
   ["applications", "Applications", DATA.applications.length],
-  ["queue", "Apply Queue", DATA.queue.length],
-  ["engine", "Engine", DATA.cronJobs.length],
+  ["engine", "Sources", DATA.providerInventory.length],
 ];
 let leadFilter = "all";
 let leadSearch = "";
