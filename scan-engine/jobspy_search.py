@@ -1039,12 +1039,9 @@ def run_jobspy_queries() -> list[dict]:
 
 
 def load_applied_keys() -> set[str]:
-    if not APP_LOG.exists(): return set()
-    try:
-        data=json.loads(APP_LOG.read_text())
-        return {norm((x.get('company','')+'|'+x.get('title',''))) for x in data if x.get('status') != 'rejected'}
-    except Exception:
-        return set()
+    # Dedup against the tracker/pipeline is handled downstream by the Node sink
+    # (scan-lib.appendPostings), so the Python engine emits all scored postings.
+    return set()
 
 
 CHANCE_RANK = {'high': 3, 'good': 2, 'possible': 1, 'low': 0}
