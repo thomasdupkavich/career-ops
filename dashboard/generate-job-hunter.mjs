@@ -1056,21 +1056,42 @@ document.getElementById('scanOverlay').addEventListener('click', function(e) {
   if (e.target === this) closeScanModal();
 });
 
-async function startScan() {
-  const btn = document.getElementById('scanBtn');
-  btn.disabled = true;
-  document.getElementById('scanLog').textContent = 'Starting scan…\\n';
-  document.getElementById('scanFoot').innerHTML = '<div class="spin"></div><span style="color:var(--text-dim);font-size:12px;margin-left:8px">Scanning portals — this takes a minute…</span>';
+function setScanBusy(busy) {
+  document.getElementById('scanBtn').disabled = busy;
+  document.getElementById('deepScanBtn').disabled = busy;
+}
+
+async function runScan(endpoint, opts) {
+  setScanBusy(true);
+  document.getElementById('scanModalTitle').textContent = opts.title;
+  document.getElementById('scanLog').textContent = opts.starting + '\\n';
+  document.getElementById('scanFoot').innerHTML = '<div class="spin"></div><span style="color:var(--text-dim);font-size:12px;margin-left:8px">' + opts.subtitle + '</span>';
   openScanModal();
   try {
-    const r = await fetch(API + '/api/scan', { method: 'POST' });
+    const r = await fetch(API + endpoint, { method: 'POST' });
     if (!r.ok && r.status !== 409) throw new Error('HTTP ' + r.status);
     pollScan();
   } catch (err) {
     document.getElementById('scanLog').textContent = 'Could not reach the scan server.\\n\\nMake sure the dashboard was launched via the JobHunter Dashboard.command file.\\n\\nError: ' + err.message;
     document.getElementById('scanFoot').innerHTML = '<span style="color:var(--rose);font-size:12px">Server not reachable</span><button class="btn" onclick="closeScanModal()" style="margin-left:auto">Close</button>';
-    btn.disabled = false;
+    setScanBusy(false);
   }
+}
+
+function startScan() {
+  return runScan('/api/scan', {
+    title: 'Scan — ATS portals + JobSpy',
+    starting: 'Starting scan…',
+    subtitle: 'Scanning portals + aggregators (free, no tokens) — about a minute…',
+  });
+}
+
+function startDeepScan() {
+  return runScan('/api/scan/deep', {
+    title: 'Deep Scan — Claude + Codex',
+    starting: 'Starting AI discovery (Claude + Codex in parallel)…',
+    subtitle: 'Discovering new companies/boards — uses tokens, a few minutes…',
+  });
 }
 
 function pollScan() {
