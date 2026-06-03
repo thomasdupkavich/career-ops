@@ -42,9 +42,10 @@ APIFY_WELLFOUND_ACTOR = 'blackfalcondata~wellfound-scraper'
 APIFY_TIMEOUT_SECS = 150
 JOBSPY_TOTAL_TIMEOUT_SECS = 150
 
-CORE = ['c#', '.net', '.net core', 'asp.net', 'asp.net mvc', 'asp.net web api', 'entity framework', 'sql server', 't-sql', 'stored procedures', 'rest api', 'restful']
+# Keyword lists mirror cv.md / data/resume/. Update both when the resume changes.
+CORE = ['c#', '.net', '.net core', 'asp.net', 'asp.net mvc', 'asp.net web api', 'blazor', 'vb.net', 'entity framework', 'sql server', 't-sql', 'stored procedures', 'rest api', 'restful']
 DB = ['query optimization', 'views', 'indexes', 'ctes', 'window functions', 'complex joins', 'bulk operations', 'transaction management', 'data migration', 'ssms']
-FE = ['javascript', 'jquery', 'ajax', 'typescript', 'react', 'html5', 'css3', 'razor', 'kendo ui', 'telerik', 'bootstrap', 'responsive design', 'websockets']
+FE = ['javascript', 'jquery', 'ajax', 'typescript', 'react', 'html5', 'css3', 'razor', 'blazor', 'kendo ui', 'telerik', 'devexpress', 'bootstrap', 'responsive design', 'websockets']
 TOOLS = ['azure devops', 'azure pipelines', 'ado', 'git', 'ci/cd', 'visual studio', 'vs code', 'jira', 'postman', 'epplus']
 PRACTICES = ['solid', 'oop', 'design patterns', 'repository pattern', 'dependency injection', 'agile', 'scrum', 'unit testing', 'code reviews']
 SPECIAL = ['hardware-software integration', 'hardware software integration', 'iot', 'real-time', 'session-based workflows']
