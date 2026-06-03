@@ -993,25 +993,7 @@ function renderApplications() {
     '<div class="view-header"><div><h1>Applications</h1><p class="sub">Career-ops tracker plus pending scan pipeline entries.</p></div></div>' +
     '<div class="table-wrap"><table><thead><tr><th>#</th><th>Date</th><th>Company</th><th>Role</th><th>Score</th><th>Status</th><th>Notes</th></tr></thead><tbody>' + (appRows + pendingRows || '<tr><td colspan="7">No tracked applications yet.</td></tr>') + '</tbody></table></div>';
 }
-function renderQueue() {
-  const rows = DATA.queue.map(function(item) {
-    return '<tr><td>#' + esc(item.number) + '</td><td><strong>' + esc(item.company) + '</strong><div class="meta">' + esc(item.location) + '</div></td><td>' + esc(item.title) + '</td><td>' + esc(item.score) + '</td><td><span class="status-pill ' + esc(item.status) + '">' + esc(item.status) + '</span></td><td>' + esc(item.salary) + '</td><td>' + esc(dt(item.updatedAt)) + '</td><td>' + (item.url ? '<a href="' + esc(item.url) + '" target="_blank" rel="noreferrer">open</a>' : '') + '</td></tr>';
-  }).join("");
-  document.getElementById("queue").innerHTML =
-    '<div class="view-header"><div><h1>Apply Queue</h1><p class="sub">Prepared application queue from the Hermes job-search run. Submit safeguards stay outside this dashboard.</p></div></div>' +
-    '<div class="table-wrap"><table><thead><tr><th>#</th><th>Company</th><th>Role</th><th>Score</th><th>Status</th><th>Salary</th><th>Updated</th><th>Link</th></tr></thead><tbody>' + (rows || '<tr><td colspan="8">No queued applications found.</td></tr>') + '</tbody></table></div>';
-}
 function renderEngine() {
-  const cronRows = DATA.cronJobs.map(function(job) {
-    const statusClass = /error|fail/i.test(job.lastStatus) ? "failed" : (job.enabled ? "submitted" : "queued");
-    const error = job.lastError ? '<div class="snippet">' + esc(job.lastError) + '</div>' : "";
-    return '<div class="row-card"><div class="panel-head"><h3>' + esc(job.name) + '</h3><span class="status-pill ' + statusClass + '">' + esc(job.enabled ? "enabled" : "paused") + '</span></div><div class="meta">' + esc(job.script || "agent prompt") + '</div><div class="tags"><span class="tag system">' + esc(job.sourceSystem) + '</span><span class="tag">' + esc(job.schedule || "unscheduled") + '</span><span class="tag">' + esc(job.lastStatus || "no status") + '</span><span class="tag">last ' + esc(dt(job.lastRunAt) || "never") + '</span><span class="tag">next ' + esc(dt(job.nextRunAt) || "none") + '</span></div>' + error + '</div>';
-  }).join("");
-  const runRows = DATA.openclaw.runs.map(function(run) {
-    const statusClass = /error|fail/i.test(run.status) ? "failed" : "submitted";
-    const counts = run.counts && run.counts.raw ? fmt(run.counts.raw) + " raw / " + fmt(run.counts.viable) + " viable / " + fmt(run.counts.shown) + " shown" : "counts unavailable";
-    return '<div class="row-card"><div class="panel-head"><h3>OpenClaw run</h3><span class="status-pill ' + statusClass + '">' + esc(run.status || "unknown") + '</span></div><div class="tags"><span class="tag">ran ' + esc(dt(run.runAt) || "unknown") + '</span><span class="tag">' + esc(counts) + '</span><span class="tag">' + esc(run.deliveryStatus || "delivery unknown") + '</span></div><div class="snippet">' + esc(run.summaryPreview || run.error || "") + '</div></div>';
-  }).join("");
   const sourceRows = DATA.sourceBreakdown.map(function(source) {
     return '<div class="kv"><span>' + esc(source.name) + '</span><strong>' + fmt(source.count) + '</strong></div>';
   }).join("");
@@ -1022,16 +1004,14 @@ function renderEngine() {
     return '<div class="kv"><span>' + esc(provider.id) + '</span><strong>' + esc(provider.file) + '</strong></div>';
   }).join("");
   document.getElementById("engine").innerHTML =
-    '<div class="view-header"><div><h1>Engine</h1><p class="sub">Local JobSpy, apply queue, cron, and career-ops scan signals in one place.</p></div></div>' +
+    '<div class="view-header"><div><h1>Sources &amp; Providers</h1><p class="sub">Where leads come from — all scanned locally, no external agents.</p></div></div>' +
     '<div class="stats">' +
-      stat("Skipped below threshold", fmt(DATA.stats.skippedBelowThreshold), "filtered before display") +
-      stat("Sources", fmt(DATA.sourceBreakdown.length), "JobSpy, MCP, and provider feeds", true) +
+      stat("Scan sources", fmt(DATA.sourceBreakdown.length), "ATS + JobSpy + Deep Scan", true) +
       stat("Provider adapters", fmt(DATA.stats.providerAdapters), "from career-ops providers/") +
-      stat("Cron hooks", fmt(DATA.cronJobs.length), "job/apply related") +
+      stat("Total scanned", fmt(DATA.stats.scanHistoryCount), "in scan-history.tsv") +
     '</div>' +
-    '<div class="grid two"><div class="panel"><div class="panel-head"><h2>Cron Jobs</h2><span class="meta">Hermes + OpenClaw</span></div><div class="job-list">' + (cronRows || '<div class="empty">No job-related cron hooks found.</div>') + '</div></div>' +
-    '<div class="grid"><div class="panel"><div class="panel-head"><h2>OpenClaw Runs</h2><span class="meta">' + esc(dt(DATA.openclaw.latestSuccessfulRunAt) || "no successful run") + '</span></div><div class="job-list">' + (runRows || '<div class="empty">No OpenClaw cron runs found.</div>') + '</div></div><div class="panel"><div class="panel-head"><h2>Job Sources</h2></div><div class="split-list">' + (sourceRows || '<div class="empty">No source counts found.</div>') + '</div></div><div class="panel"><div class="panel-head"><h2>Provider Adapters</h2></div><div class="split-list">' + (providerRows || '<div class="empty">No provider adapters found.</div>') + '</div></div><div class="panel"><div class="panel-head"><h2>Career-Ops Portals</h2></div><div class="split-list">' + (portalRows || '<div class="empty">No portal scan history found.</div>') + '</div></div><div class="panel"><div class="panel-head"><h2>Profile</h2></div><div class="split-list"><div class="kv"><span>Location</span><strong>' + esc(DATA.user.location || "not set") + '</strong></div><div class="kv"><span>Remote</span><strong>' + esc(DATA.user.remotePreference || "not set") + '</strong></div><div class="kv"><span>Salary min</span><strong>' + esc(DATA.user.salaryMin || "not set") + '</strong></div></div></div></div></div>' +
-    '<div class="fine-print">Snapshot sources: ' + esc(DATA.paths.jobSearchDir) + ', ' + esc(DATA.paths.openclawHome) + ', and ' + esc(DATA.paths.projectRoot) + '/data.</div>';
+    '<div class="grid"><div class="panel"><div class="panel-head"><h2>Scan Sources</h2></div><div class="split-list">' + (sourceRows || '<div class="empty">No source counts yet — hit Scan Now.</div>') + '</div></div><div class="panel"><div class="panel-head"><h2>Provider Adapters</h2></div><div class="split-list">' + (providerRows || '<div class="empty">No provider adapters found.</div>') + '</div></div><div class="panel"><div class="panel-head"><h2>Scanned Portals</h2></div><div class="split-list">' + (portalRows || '<div class="empty">No portal scan history found.</div>') + '</div></div><div class="panel"><div class="panel-head"><h2>Profile</h2></div><div class="split-list"><div class="kv"><span>Location</span><strong>' + esc(DATA.user.location || "not set") + '</strong></div><div class="kv"><span>Remote</span><strong>' + esc(DATA.user.remotePreference || "not set") + '</strong></div><div class="kv"><span>Salary min</span><strong>' + esc(DATA.user.salaryMin || "not set") + '</strong></div></div></div></div>' +
+    '<div class="fine-print">Snapshot source: ' + esc(DATA.paths.projectRoot) + '/data (pipeline.md + scan-history.tsv).</div>';
 }
 function bindJumpLinks() {
   document.querySelectorAll("[data-jump]").forEach(function(link) {
