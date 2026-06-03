@@ -49,11 +49,13 @@ function parseEngineOutput(stdout) {
 }
 
 /**
- * @param {{ onLog?: (line: string) => void, dryRun?: boolean }} [opts]
+ * @param {{ onLog?: (line: string) => void, dryRun?: boolean, collectOnly?: boolean }} [opts]
+ *   collectOnly — scrape + return postings WITHOUT writing. Lets an orchestrator
+ *   run this in parallel with the ATS scan and serialize the writes afterward.
  * @returns {Promise<{ skipped?: boolean, reason?: string, added?: number,
- *   dedupSkipped?: number, total?: number, stats?: object }>}
+ *   dedupSkipped?: number, total?: number, stats?: object, postings?: Array }>}
  */
-export function runJobSpy({ onLog = () => {}, dryRun = false } = {}) {
+export function runJobSpy({ onLog = () => {}, dryRun = false, collectOnly = false } = {}) {
   return new Promise((resolve) => {
     if (!existsSync(PY)) {
       onLog('JobSpy engine not set up — run `sh scan-engine/setup.sh` to enable aggregator search. Skipping.');
