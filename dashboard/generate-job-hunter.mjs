@@ -796,6 +796,8 @@ tr:last-child td { border-bottom: 0; }
 .scan-btn { display:flex; align-items:center; gap:7px; width:100%; padding:9px 10px; border:1px solid rgba(61,219,217,.35); border-radius:6px; background:var(--accent-dim); color:var(--accent); cursor:pointer; font-size:13px; font-weight:700; }
 .scan-btn:hover { border-color:var(--accent); background:rgba(61,219,217,.18); }
 .scan-btn:disabled { opacity:.45; cursor:not-allowed; }
+.scan-btn.deep { margin-top:7px; border-color:rgba(167,139,250,.35); background:rgba(167,139,250,.12); color:var(--violet); }
+.scan-btn.deep:hover { border-color:var(--violet); background:rgba(167,139,250,.2); }
 .scan-overlay { display:none; position:fixed; inset:0; z-index:200; background:rgba(0,0,0,.72); backdrop-filter:blur(4px); align-items:center; justify-content:center; }
 .scan-overlay.open { display:flex; }
 .scan-modal { width:min(700px,95vw); max-height:82vh; display:flex; flex-direction:column; border:1px solid var(--border); border-radius:12px; background:var(--surface); overflow:hidden; }
