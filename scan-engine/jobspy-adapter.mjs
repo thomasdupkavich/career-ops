@@ -85,6 +85,11 @@ export function runJobSpy({ onLog = () => {}, dryRun = false, collectOnly = fals
         resolve({ skipped: true, reason: 'parse-error', stats });
         return;
       }
+      if (collectOnly) {
+        onLog(`JobSpy: scraped ${postings.length} scored postings (write deferred to orchestrator)`);
+        resolve({ total: postings.length, postings, stats });
+        return;
+      }
       const { added, skipped } = appendPostings(postings, { dryRun });
       onLog(
         `JobSpy: scraped ${postings.length} scored postings → ${added} new, ${skipped} dup/seen` +
